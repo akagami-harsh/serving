@@ -60,8 +60,8 @@ type hashData struct {
 	step int
 }
 
-func (hd *hashData) fromIndexSet(s sets.Int) sets.String {
-	ret := make(sets.String, len(s))
+func (hd *hashData) fromIndexSet(s sets.Int) sets.Set[string] {
+	ret := make(sets.Set[string], len(s))
 	for v := range s {
 		ret.Insert(hd.nameForHIndex(v))
 	}
@@ -72,14 +72,14 @@ func (hd *hashData) nameForHIndex(hi int) string {
 	return hd.nameLookup[hd.hashPool[hi]]
 }
 
-func buildHashes(in sets.String, target string) *hashData {
+func buildHashes(in sets.Set[string], target string) *hashData {
 	// Any one changing this function must execute
 	// `go test -run=TestOverlay -count=200`.
 	// This is to ensure there is no regression in the selection
 	// algorithm.
 
 	// Sorted list to ensure consistent results every time.
-	from := in.List()
+	from := sets.List(in)
 	// Write in two pieces, so we don't allocate temp string which is sum of both.
 	buf := bytes.NewBufferString(target)
 	buf.WriteString(startSalt)
@@ -126,7 +126,7 @@ func buildHashes(in sets.String, target string) *hashData {
 // ChooseSubset is an internal function and presumes sanitized inputs.
 // TODO(vagababov): once initial impl is ready, think about how to cache
 // the prepared data.
-func ChooseSubset(from sets.String, n int, target string) sets.String {
+func ChooseSubset(from sets.Set[string], n int, target string) sets.Set[string] {
 	if n >= len(from) {
 		return from
 	}

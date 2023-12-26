@@ -520,7 +520,7 @@ func findMatchingWildcardCert(ctx context.Context, domains []string, certs []*ne
 }
 
 func wildcardCertMatches(ctx context.Context, domains []string, cert *netv1alpha1.Certificate) bool {
-	dnsNames := make(sets.String, len(cert.Spec.DNSNames))
+	dnsNames := make(sets.Set[string], len(cert.Spec.DNSNames))
 	logger := logging.FromContext(ctx)
 
 	for _, dns := range cert.Spec.DNSNames {
